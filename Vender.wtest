@@ -1,0 +1,77 @@
+import vendedores.*
+import Clientes.*
+
+describe "ProbarVendedores"{
+	
+	const chivilcoy = new Ciudad(provincia ="BuenosAires" ,poblacion = 500000)
+	const bragado =  new Ciudad(provincia ="BuenosAires" ,poblacion = 500000)
+	const lobos =  new Ciudad(provincia ="BuenosAires" ,poblacion = 50000)
+	const pergamino =  new Ciudad(provincia ="BuenosAires" ,poblacion = 800000)
+	const zarate =  new Ciudad(provincia ="BuenosAires" ,poblacion = 123000)
+	
+	const rosario =  new Ciudad(provincia ="SantaFe" ,poblacion = 5755600)
+	const rafaela =  new Ciudad(provincia ="SantaFe" ,poblacion = 6756000)
+	const sanFrancisco =  new Ciudad(provincia ="Cordoba" ,poblacion = 15800)
+	const diamante =  new Ciudad(provincia ="EntreRios" ,poblacion = 5340000)
+	
+	var certificado1 = new  Certificacion(cantPuntos = 0, productos ="Heladera" )
+	var certificado2 = new  Certificacion(cantPuntos = 0, productos ="Horno" )
+	var certificado3 = new  Certificacion(cantPuntos = 100 )
+	var certificado4 = new  Certificacion(cantPuntos = 2, productos ="Tv" )
+	var certificado5 = new  Certificacion(cantPuntos = 200, productos ="piano" )
+	
+	const juan =
+		 new VendedorFijo(certificaciones = [certificado1,certificado3],ciudadQueVive = zarate )
+	const pepe =
+		 new VendedorViajante(certificaciones = [certificado1,certificado4], provinciasHabilitadas= [lobos,sanFrancisco ] )
+	const maria =
+		 new VendedorFijo(certificaciones = [certificado1,certificado2,certificado3],ciudadQueVive = rafaela )
+	const comercioA = 
+		new ComercioCorresponsal(certificaciones = [certificado2,certificado5],ciudadesHabilitadas = #{diamante,lobos,chivilcoy,rafaela} )
+	
+	const centro = new CentroDeDistribucion (ciudadActual =sanFrancisco , vendedores = #{juan , pepe , maria , comercioA} )
+	
+	const cInseguro = new ClienteInseguro()
+	const cDetallista = new ClienteDetallista()
+	const cHumanista = new ClienteHumanista()
+	
+	test"pruebaDeVentas"{
+		
+		assert.equals(false,juan.vendedorVersatil())
+		assert.equals(false,pepe.vendedorVersatil())
+		assert.equals(true,maria.vendedorVersatil())
+		assert.equals(false,comercioA.vendedorVersatil())
+		
+		assert.equals(true,juan.vendedorFirme())
+		assert.equals(false,pepe.vendedorFirme())
+		assert.equals(true,maria.vendedorFirme())
+		assert.equals(true,comercioA.vendedorFirme())
+		
+		assert.equals(false,juan.vendedorInfluyente())
+		assert.equals(false,pepe.vendedorInfluyente())
+		assert.equals(false,maria.vendedorInfluyente())
+		assert.equals(true,comercioA.vendedorInfluyente())
+		
+		assert.equals(comercioA,centro.vendedorEstrella())
+		assert.equals(true,centro.puedeCubrirDicha(pergamino))
+		assert.equals(true,centro.puedeCubrirDicha(zarate))
+		assert.equals(#{juan,pepe,maria,comercioA},centro.vendedoresGenericos())
+		assert.equals(true,centro.robusto())
+		
+		assert.equals(false,juan.vendedorCandidato(centro))
+		assert.equals(true,pepe.vendedorCandidato(centro))
+		assert.equals(false,maria.vendedorCandidato(centro))
+		assert.equals(false,comercioA.vendedorCandidato(centro))
+		
+		assert.equals(false,cInseguro.seAtiendePor(juan))
+		assert.equals(true,cInseguro.seAtiendePor(maria))
+		assert.equals(false,cDetallista.seAtiendePor(comercioA))
+		assert.equals(true,cDetallista.seAtiendePor(maria))
+		assert.equals(true,cHumanista.seAtiendePor(maria))
+		assert.equals(false,cHumanista.seAtiendePor(comercioA))
+		
+	}
+	
+}
+
+	
